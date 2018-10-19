@@ -1,0 +1,5 @@
+---
+applications:
+ - name: iot-python
+   random-route: true
+   memory: 128M
