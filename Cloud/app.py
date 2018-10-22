@@ -1,8 +1,11 @@
+from datetime import datetime
 from cloudant import Cloudant
 from flask import Flask, render_template, request, jsonify, redirect
+from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 import os
 import json
+import random
 
 import ibmiotf.application
 
@@ -101,23 +104,33 @@ def root():
 
 
 # Endpoint na ovládanie svetla
-# TODO
-@app.route('/api/svetlo/', methods=['GET', 'POST'])
+@app.route('/api/svetlo', methods=['POST'])
 def svetlo_route():
-    mydata = {"d": {"set": "TODO"}}
-    print(mydata)
-    iot_client.connect()
-    iot_client.publishCommand("ESP8266", "12345", "svetlo", "json", mydata)
-    return jsonify("TODO")
+    # {"senzor": "led", "miestnost": cislo_miestnosti, "status": "on/off"}
+    # nastav silent na True, v prípade, že zlyhá json parse vráti None
+    command = request.get_json(silent=True)
+
+    if command is not None:
+        if iot_client is None:
+            return jsonify(responseCode=503, status="zariadenie neodpovedá")
+        else:
+            iot_client.connect()
+            iot_client.publishCommand("ESP8266", "12345", "svetlo", "json", command)
+        return jsonify(responseCode=200, status="ok")
+    else:
+        return jsonify(responseCode=400, status="zlý request")
 
 
 # Endpoint na zistenie poslednej nameranej hodnoty teploty a vlhkosti
-# TODO
-@app.route('/dht', methods=['GET', 'POST'])
+@app.route('/api/dht', methods=['GET', 'POST'])
 def temp_route():
-    comm = {"d": {"sensor": "DHT11"}}
-    iot_client.publishCommand("ESP8266", "12345", "temp", "json", comm)
-    return jsonify(temp=temp, humidity=humidity)
+    return jsonify(responseCode=200, cas=str(datetime.now()), teplota=random.randint(20, 35), vlhkost=random.randint(30,70))
+
+
+# Endpoint slúžiaci na odomknutie/zamknutie dverí (vchodové, garážové)
+@app.route('/api/dvere', methods=['POST'])
+def dvere_route():
+    return jsonify("TODO")
 
 
 @atexit.register
