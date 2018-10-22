@@ -83,6 +83,16 @@ def command_callback(event):
         print(f"T:{temp} H:{humidity}")
 
 
+# V debug móde sa background task vykoná dvakrát,
+# preto som dočasne nastavil v app.run use_reloader na False
+def dht_background_task():
+    print(str(datetime.now()))
+    # TODO
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=dht_background_task, trigger="interval", seconds=10)
+scheduler.start()
+
 if iot_client is not None:
     iot_client.setKeepAliveInterval(60)
     iot_client.connect()
@@ -140,4 +150,4 @@ def shutdown():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=True, use_reloader=False)
