@@ -15,6 +15,8 @@ db_name = 'mydb'
 client = None
 db = None
 
+iot_client = None
+
 if 'VCAP_SERVICES' in os.environ:
     vcap = json.loads(os.getenv('VCAP_SERVICES'))
     print('Found VCAP_SERVICES')
@@ -70,12 +72,14 @@ elif os.path.isfile('vcap-local.json'):
         except Exception as e:
             print(e)
 
-iot_client = None
+cas = ""
+temp = 0
+humidity = 0
 
 
 def command_callback(event):
     payload = json.loads(event.payload)
-    if event.event == "temp":
+    if event.event == "dht":
         global temp
         global humidity
         temp = int(payload["d"]["t"])
@@ -86,19 +90,24 @@ def command_callback(event):
 # V debug móde sa background task vykoná dvakrát,
 # preto som dočasne nastavil v app.run use_reloader na False
 def dht_background_task():
-    print(str(datetime.now()))
-    # TODO
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=dht_background_task, trigger="interval", seconds=10)
-scheduler.start()
+    global cas
+    cas = str(datetime.now())
+    command = {"senzor": "dht"}
+    if iot_client is not None:
+        iot_client.connect()
+        iot_client.publishCommand("ESP8266", "int_domacnost1", "dht", "json", command)
 
 if iot_client is not None:
     iot_client.setKeepAliveInterval(60)
     iot_client.connect()
     iot_client.deviceEventCallback = command_callback
     i = iot_client.subscribeToDeviceCommands()
-    iot_client.subscribeToDeviceEvents(event="temp")
+    iot_client.subscribeToDeviceEvents(event="dht")
+
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=dht_background_task, trigger="interval", seconds=600)
+scheduler.start()
 
 
 # On IBM Cloud Cloud Foundry, get the port number from the environment variable PORT
@@ -110,7 +119,7 @@ humidity = 0
 
 @app.route('/')
 def root():
-    return app.send_static_file('index.html')
+    return render_template('index.html', cas=cas, temp=temp, humidity=humidity)
 
 
 # Endpoint na ovládanie svetla
@@ -125,16 +134,16 @@ def svetlo_route():
             return jsonify(responseCode=503, status="zariadenie neodpovedá")
         else:
             iot_client.connect()
-            iot_client.publishCommand("ESP8266", "12345", "svetlo", "json", command)
+            iot_client.publishCommand("ESP8266", "int_domacnost1", "svetlo", "json", command)
         return jsonify(responseCode=200, status="ok")
     else:
         return jsonify(responseCode=400, status="zlý request")
 
 
 # Endpoint na zistenie poslednej nameranej hodnoty teploty a vlhkosti
-@app.route('/api/dht', methods=['GET', 'POST'])
+@app.route('/api/dht', methods=['GET'])
 def temp_route():
-    return jsonify(responseCode=200, cas=str(datetime.now()), teplota=random.randint(20, 35), vlhkost=random.randint(30,70))
+    return jsonify(responseCode=200, cas=cas, teplota=temp, vlhkost=humidity)
 
 
 # Endpoint slúžiaci na odomknutie/zamknutie dverí (vchodové, garážové)
