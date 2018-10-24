@@ -11,7 +11,7 @@ import ibmiotf.application
 
 app = Flask(__name__, static_url_path='')
 
-db_name = 'mydb'
+db_name = 'iot'
 client = None
 db = None
 
@@ -84,6 +84,13 @@ def command_callback(event):
         global humidity
         temp = int(payload["d"]["t"])
         humidity = int(payload["d"]["h"])
+
+        jsonDocument = {
+            "cas": cas,
+            "teplota": temp,
+            "vlhkost": humidity
+        }
+        novyDokument = db.create_document(jsonDocument)
         print(f"T:{temp} H:{humidity}")
 
 
@@ -131,7 +138,7 @@ def svetlo_route():
 
     if command is not None:
         if iot_client is None:
-            return jsonify(responseCode=503, status="zariadenie neodpovedá")
+            return jsonify(responseCode=503, status="watson iot neodpovedá")
         else:
             iot_client.connect()
             iot_client.publishCommand("ESP8266", "int_domacnost1", "svetlo", "json", command)
