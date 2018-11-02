@@ -104,6 +104,7 @@ def dht_background_task():
         iot_client.connect()
         iot_client.publishCommand("ESP8266", "int_domacnost1", "dht", "json", command)
 
+
 if iot_client is not None:
     iot_client.setKeepAliveInterval(60)
     iot_client.connect()
@@ -123,6 +124,7 @@ port = int(os.getenv('PORT', 8000))
 
 temp = 0
 humidity = 0
+
 
 @app.route('/')
 def root():
@@ -156,6 +158,11 @@ def temp_route():
 # Endpoint slúžiaci na odomknutie/zamknutie dverí (vchodové, garážové)
 @app.route('/api/dvere', methods=['POST'])
 def dvere_route():
+    return jsonify("TODO")
+
+
+@app.route('/api/notifikacia', methods=['POST'])
+def app_notifikacia():
     return jsonify("TODO")
 
 
