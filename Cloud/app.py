@@ -5,7 +5,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 import os
 import json
-import random
 import requests
 
 import ibmiotf.application

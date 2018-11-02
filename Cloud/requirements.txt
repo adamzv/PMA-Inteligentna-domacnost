@@ -2,3 +2,4 @@ Flask
 cloudant
 ibmiotf
 APScheduler
+requests
