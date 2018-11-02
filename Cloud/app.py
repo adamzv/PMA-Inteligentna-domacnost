@@ -6,6 +6,7 @@ import atexit
 import os
 import json
 import random
+import requests
 
 import ibmiotf.application
 
@@ -15,6 +16,7 @@ db_name = 'iot'
 client = None
 db = None
 
+imf_push_api = ""
 iot_client = None
 
 if 'VCAP_SERVICES' in os.environ:
@@ -32,6 +34,8 @@ if 'VCAP_SERVICES' in os.environ:
         iot_org = iot_creds['org']
         iot_auth_key = iot_creds['apiKey']
         iot_auth_token = iot_creds['apiToken']
+    if 'imfpush' in vcap:
+        imf_push_api = vcap['imfpush'][0]['credentials']['apikey']
         try:
             options = {
                 "org": iot_org,
@@ -61,6 +65,8 @@ elif os.path.isfile('vcap-local.json'):
         iot_org = iot_creds['org']
         iot_auth_key = iot_creds['apiKey']
         iot_auth_token = iot_creds['apiToken']
+
+        imf_push_api = vcap['services']['imfpush'][0]['credentials']['apikey']
         try:
             options = {
                 "org": iot_org,
@@ -163,7 +169,31 @@ def dvere_route():
 
 @app.route('/api/notifikacia', methods=['POST'])
 def app_notifikacia():
-    return jsonify("TODO")
+    sprava = request.form.get("sprava")
+
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+    }
+    payload = {
+        'grant_type': 'urn:ibm:params:oauth:grant-type:apikey',
+        'apikey': imf_push_api,
+    }
+    response = requests.post('https://iam.bluemix.net/identity/token', headers=headers, data=payload, verify=False)
+    access = response.json()['access_token']
+
+    push_headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Accept-Language': 'en-US',
+        'Authorization': access,
+    }
+    push_payload = {
+        'message': {'alert': sprava},
+    }
+    push_notification = requests.post(***REMOVED***,
+                                      headers=push_headers, data=json.dumps(push_payload), verify=False)
+    return redirect('/')
 
 
 @atexit.register

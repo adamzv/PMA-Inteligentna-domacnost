@@ -7,6 +7,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Inteligentná domácnosť</title>
 
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelector("#notifikacia").onsubmit = () => {
+        const request = new XMLHttpRequest();
+        const sprava = document.querySelector("#text").value;
+        request.open("POST", "/api/notifikacia");
+
+        const data = new FormData();
+        data.append("sprava", sprava);
+
+        request.send(data);
+        return false;
+    };
+});
+</script>
+
+
     <!-- Bootstrap -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <link href="../static/styles.css" rel="stylesheet">
@@ -35,25 +53,5 @@
     </footer>
 
 </body>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelector("#notifikacia").onsubmit = () => {
-        const request = new XMLHttpRequest();
-        const sprava = document.querySelector("#test").value;
-        request.open("POST", "/api/notifikacia");
-
-        request.onload = () => {
-
-        }
-
-        const data = new FormData();
-        data.append("sprava", sprava);
-
-        request.send(data);
-        return false;
-    };
-});
-</script>
 
 </html>
