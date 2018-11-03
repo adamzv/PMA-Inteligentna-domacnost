@@ -1,5 +1,4 @@
 from datetime import datetime
-from cloudant import Cloudant
 from flask import Flask, render_template, request, jsonify, redirect
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
@@ -29,7 +28,6 @@ logger.addHandler(sh)
 
 db_name = 'iot'
 client = None
-db = None
 
 imf_push_api = ""
 imf_push_appguid = ""
@@ -39,13 +37,6 @@ iot_client = None
 if 'VCAP_SERVICES' in os.environ:
     vcap = json.loads(os.getenv('VCAP_SERVICES'))
     print('Found VCAP_SERVICES')
-    if 'cloudantNoSQLDB' in vcap:
-        creds = vcap['cloudantNoSQLDB'][0]['credentials']
-        user = creds['username']
-        password = creds['password']
-        url = 'https://' + creds['host']
-        client = Cloudant(user, password, url=url, connect=True)
-        db = client.create_database(db_name, throw_on_exists=False)
     if 'iotf-service' in vcap:
         iot_creds = vcap['iotf-service'][0]['credentials']
         iot_org = iot_creds['org']
@@ -64,21 +55,10 @@ if 'VCAP_SERVICES' in os.environ:
             iot_client = ibmiotf.application.Client(options, logHandlers=logger.handlers)
         except Exception as e:
             print(e)
-elif "CLOUDANT_URL" in os.environ:
-    client = Cloudant(os.environ['CLOUDANT_USERNAME'], os.environ['CLOUDANT_PASSWORD'], url=os.environ['CLOUDANT_URL'],
-                      connect=True)
-    db = client.create_database(db_name, throw_on_exists=False)
 elif os.path.isfile('vcap-local.json'):
     with open('vcap-local.json') as f:
         vcap = json.load(f)['VCAP_SERVICES']
         print('Found local VCAP_SERVICES')
-        creds = vcap['cloudantNoSQLDB'][0]['credentials']
-        user = creds['username']
-        password = creds['password']
-        url = 'https://' + creds['host']
-        client = Cloudant(user, password, url=url, connect=True)
-        db = client.create_database(db_name, throw_on_exists=False)
-
         iot_creds = vcap['iotf-service'][0]['credentials']
         iot_org = iot_creds['org']
         iot_auth_key = iot_creds['apiKey']
@@ -115,7 +95,6 @@ def command_callback(event):
             "teplota": temp,
             "vlhkost": humidity
         }
-        novyDokument = db.create_document(jsonDocument)
         print(f"T:{temp} H:{humidity}")
 
 
