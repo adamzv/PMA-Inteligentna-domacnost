@@ -1,0 +1,13 @@
+.gradle
+/local.properties
+.DS_Store
+/build
+# Intellij
+*.iml
+.idea*
+/build
+/captures
+
+PMAInteligentnadomacnost-Android/app/src/main/res/values/credentials.xml
+android/app/src/main/res/values/credentials.xml
+google-services.json
