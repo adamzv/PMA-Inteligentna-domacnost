@@ -169,30 +169,33 @@ def dvere_route():
 @app.route('/api/notifikacia', methods=['POST'])
 def app_notifikacia():
     sprava = request.form.get("sprava")
+    heslo = request.form.get("heslo")
+    if heslo == "piroskovci":
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json',
+        }
+        payload = {
+            'grant_type': 'urn:ibm:params:oauth:grant-type:apikey',
+            'apikey': imf_push_api,
+        }
+        response = requests.post('https://iam.bluemix.net/identity/token', headers=headers, data=payload, verify=False)
+        access = response.json()['access_token']
 
-    headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept': 'application/json',
-    }
-    payload = {
-        'grant_type': 'urn:ibm:params:oauth:grant-type:apikey',
-        'apikey': imf_push_api,
-    }
-    response = requests.post('https://iam.bluemix.net/identity/token', headers=headers, data=payload, verify=False)
-    access = response.json()['access_token']
-
-    push_headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Accept-Language': 'en-US',
-        'Authorization': access,
-    }
-    push_payload = {
-        'message': {'alert': sprava},
-    }
-    push_notification = requests.post(***REMOVED***,
-                                      headers=push_headers, data=json.dumps(push_payload), verify=False)
-    return redirect('/')
+        push_headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Accept-Language': 'en-US',
+            'Authorization': access,
+        }
+        push_payload = {
+            'message': {'alert': sprava},
+        }
+        push_notification = requests.post(***REMOVED***,
+                                          headers=push_headers, data=json.dumps(push_payload), verify=False)
+        return jsonify(push_notification.status_code)
+    else:
+        return jsonify(400)
 
 
 @atexit.register

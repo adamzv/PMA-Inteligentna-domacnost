@@ -7,32 +7,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Inteligentná domácnosť</title>
 
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelector("#notifikacia").onsubmit = () => {
-        const request = new XMLHttpRequest();
-        const sprava = document.querySelector("#text").value;
-        request.open("POST", "/api/notifikacia");
-
-        const data = new FormData();
-        data.append("sprava", sprava);
-
-        request.send(data);
-        return false;
-    };
-});
-</script>
-
-
     <!-- Bootstrap -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../static/styles.css" rel="stylesheet">
+    <link href="/static/styles.css" rel="stylesheet">
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelector("#notifikacia").onsubmit = () => {
+                const request = new XMLHttpRequest();
+                const sprava = document.querySelector("#text").value;
+                const heslo = document.querySelector("#heslo").value;
+                request.open("POST", "/api/notifikacia");
+
+                request.onload = () => {
+                    let response = JSON.parse(request.responseText);
+                    if (parseInt(response, 10) === 202) {
+                        document.querySelector("#vysledok").innerHTML = "Správa bola odoslaná.";
+                    } else {
+                        document.querySelector("#vysledok").innerHTML = "Niekde nastala chyba.";
+                    }
+                };
+
+                const data = new FormData();
+                data.append("sprava", sprava);
+                data.append("heslo", heslo);
+
+                request.send(data);
+                return false;
+            };
+        });
+    </script>
 </head>
 
 <body>
@@ -43,8 +51,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <!-- Dočasné testovanie notifikácii -->
         <form id="notifikacia">
             <input id="text" autocomplete="off" autofocus placeholder="Správa" type="text">
+            <input id="heslo" autocomplete="off" placeholder="Heslo" type="password">
             <input type="submit" value="Poslať notifikáciu">
         </form>
+        <h5 id="vysledok"></h5>
     </div>
     <footer class="footer">
         <div class="container">
