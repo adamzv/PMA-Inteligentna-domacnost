@@ -6,10 +6,26 @@ import atexit
 import os
 import json
 import requests
+import logging
 
 import ibmiotf.application
 
 app = Flask(__name__, static_url_path='')
+
+# Pokiaľ Watson IoT klientovi neposkytnete vlastný log handler, klient si vytvorí vlastný,
+# ktorý bude vytvárať .log súbory každého pripojenia/odpojenia.
+# Preto som si vytvoril vlastný log handler, ktorý nebude vytvárať súbory, pretože sú momentálne
+# nepotrebné.
+logger = logging.getLogger("app.py")
+logger.setLevel(logging.INFO)
+
+shFormatter = logging.Formatter('%(asctime)-25s %(name)-25s ' + ' %(levelname)-7s %(message)s')
+
+sh = logging.StreamHandler()
+sh.setFormatter(shFormatter)
+sh.setLevel(logging.DEBUG)
+
+logger.addHandler(sh)
 
 db_name = 'iot'
 client = None
@@ -42,7 +58,7 @@ if 'VCAP_SERVICES' in os.environ:
                 "auth-token": iot_auth_token,
                 "clean-session": "true"
             }
-            iot_client = ibmiotf.application.Client(options)
+            iot_client = ibmiotf.application.Client(options, logHandlers=logger.handlers)
         except Exception as e:
             print(e)
 elif "CLOUDANT_URL" in os.environ:
@@ -73,7 +89,7 @@ elif os.path.isfile('vcap-local.json'):
                 "auth-token": iot_auth_token,
                 "clean-session": "true"
             }
-            iot_client = ibmiotf.application.Client(options)
+            iot_client = ibmiotf.application.Client(options, logger.handlers)
         except Exception as e:
             print(e)
 
@@ -122,13 +138,9 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(func=dht_background_task, trigger="interval", seconds=600)
 scheduler.start()
 
-
 # On IBM Cloud Cloud Foundry, get the port number from the environment variable PORT
 # When running this app on the local machine, default the port to 8000
 port = int(os.getenv('PORT', 8000))
-
-temp = 0
-humidity = 0
 
 
 @app.route('/')
