@@ -32,6 +32,8 @@ client = None
 db = None
 
 imf_push_api = ""
+imf_push_appguid = ""
+
 iot_client = None
 
 if 'VCAP_SERVICES' in os.environ:
@@ -51,6 +53,7 @@ if 'VCAP_SERVICES' in os.environ:
         iot_auth_token = iot_creds['apiToken']
     if 'imfpush' in vcap:
         imf_push_api = vcap['imfpush'][0]['credentials']['apikey']
+        imf_push_appguid = vcap['imfpush'][0]['credentials']['appGuid']
         try:
             options = {
                 "org": iot_org,
@@ -67,21 +70,22 @@ elif "CLOUDANT_URL" in os.environ:
     db = client.create_database(db_name, throw_on_exists=False)
 elif os.path.isfile('vcap-local.json'):
     with open('vcap-local.json') as f:
-        vcap = json.load(f)
+        vcap = json.load(f)['VCAP_SERVICES']
         print('Found local VCAP_SERVICES')
-        creds = vcap['services']['cloudantNoSQLDB'][0]['credentials']
+        creds = vcap['cloudantNoSQLDB'][0]['credentials']
         user = creds['username']
         password = creds['password']
         url = 'https://' + creds['host']
         client = Cloudant(user, password, url=url, connect=True)
         db = client.create_database(db_name, throw_on_exists=False)
 
-        iot_creds = vcap['services']['iotf-service'][0]
+        iot_creds = vcap['iotf-service'][0]['credentials']
         iot_org = iot_creds['org']
         iot_auth_key = iot_creds['apiKey']
         iot_auth_token = iot_creds['apiToken']
 
-        imf_push_api = vcap['services']['imfpush'][0]['credentials']['apikey']
+        imf_push_api = vcap['imfpush'][0]['credentials']['apikey']
+        imf_push_appguid = vcap['imfpush'][0]['credentials']['appGuid']
         try:
             options = {
                 "org": iot_org,
@@ -203,7 +207,7 @@ def app_notifikacia():
         push_payload = {
             'message': {'alert': sprava},
         }
-        push_notification = requests.post(***REMOVED***,
+        push_notification = requests.post(f'http://imfpush.eu-de.bluemix.net/imfpush/v1/apps/{imf_push_appguid}/messages',
                                           headers=push_headers, data=json.dumps(push_payload), verify=False)
         return jsonify(push_notification.status_code)
     else:
