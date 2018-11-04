@@ -3,3 +3,4 @@ cloudant
 ibmiotf
 APScheduler
 requests
+peewee

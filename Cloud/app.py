@@ -1,6 +1,6 @@
-from datetime import datetime
 from flask import Flask, render_template, request, jsonify, redirect
 from apscheduler.schedulers.background import BackgroundScheduler
+from peewee import *
 import atexit
 import os
 import json
@@ -8,6 +8,10 @@ import requests
 import logging
 
 import ibmiotf.application
+
+db = PostgresqlDatabase(None)
+# import musí byť pod deklarovaním db
+from models import Dht, Senzor
 
 app = Flask(__name__, static_url_path='')
 
@@ -26,13 +30,14 @@ sh.setLevel(logging.DEBUG)
 
 logger.addHandler(sh)
 
-db_name = 'iot'
 client = None
 
 imf_push_api = ""
 imf_push_appguid = ""
 
 iot_client = None
+
+device_id = "int_domacnost1"
 
 if 'VCAP_SERVICES' in os.environ:
     vcap = json.loads(os.getenv('VCAP_SERVICES'))
@@ -55,6 +60,9 @@ if 'VCAP_SERVICES' in os.environ:
             iot_client = ibmiotf.application.Client(options, logHandlers=logger.handlers)
         except Exception as e:
             print(e)
+    if 'compose-for-postgresql' in vcap:
+        postgresql_uri = vcap['compose-for-postgresql'][0]['credentials']['uri']
+        db.init('compose', dsn=postgresql_uri)
 elif os.path.isfile('vcap-local.json'):
     with open('vcap-local.json') as f:
         vcap = json.load(f)['VCAP_SERVICES']
@@ -76,33 +84,23 @@ elif os.path.isfile('vcap-local.json'):
             iot_client = ibmiotf.application.Client(options, logger.handlers)
         except Exception as e:
             print(e)
-
-cas = ""
-temp = 0
-humidity = 0
+        postgresql_uri = vcap['compose-for-postgresql'][0]['credentials']['uri']
+        db.init('compose', dsn=postgresql_uri)
 
 
 def command_callback(event):
     payload = json.loads(event.payload)
     if event.event == "dht":
-        global temp
-        global humidity
-        temp = int(payload["d"]["t"])
-        humidity = int(payload["d"]["h"])
+        temp = float(payload["d"]["t"])
+        humidity = float(payload["d"]["h"])
 
-        jsonDocument = {
-            "cas": cas,
-            "teplota": temp,
-            "vlhkost": humidity
-        }
+        row = Dht.create(device_id="int_domacnost1", teplota=temp, vlhkost=humidity)
         print(f"T:{temp} H:{humidity}")
 
 
 # V debug móde sa background task vykoná dvakrát,
 # preto som dočasne nastavil v app.run use_reloader na False
 def dht_background_task():
-    global cas
-    cas = str(datetime.now())
     command = {"senzor": "dht"}
     if iot_client is not None:
         iot_client.connect()
@@ -128,7 +126,11 @@ port = int(os.getenv('PORT', 8000))
 
 @app.route('/')
 def root():
-    return render_template('index.html', cas=cas, temp=temp, humidity=humidity)
+    db.connect()
+    # vyberie posledné, aktuálne, hodnoty teploty a vlhkosti
+    posl_hodnota = Dht.select().order_by(Dht.id.desc()).get()
+    db.close()
+    return render_template('index.html', cas=posl_hodnota.cas, temp=posl_hodnota.teplota, humidity=posl_hodnota.vlhkost)
 
 
 # Endpoint na ovládanie svetla
@@ -152,7 +154,10 @@ def svetlo_route():
 # Endpoint na zistenie poslednej nameranej hodnoty teploty a vlhkosti
 @app.route('/api/dht', methods=['GET'])
 def temp_route():
-    return jsonify(responseCode=200, cas=cas, teplota=temp, vlhkost=humidity)
+    db.connect()
+    posl_hodnota = Dht.select().order_by(Dht.id.desc()).get()
+    db.close()
+    return jsonify(responseCode=200, cas=posl_hodnota.cas, teplota=posl_hodnota.teplota, vlhkost=posl_hodnota.vlhkost)
 
 
 # Endpoint slúžiaci na odomknutie/zamknutie dverí (vchodové, garážové)
@@ -184,7 +189,9 @@ def app_notifikacia():
             'Authorization': access,
         }
         push_payload = {
-            'message': {'alert': sprava},
+            'message': {
+                'alert': sprava
+            },
         }
         push_notification = requests.post(f'http://imfpush.eu-de.bluemix.net/imfpush/v1/apps/{imf_push_appguid}/messages',
                                           headers=push_headers, data=json.dumps(push_payload), verify=False)
