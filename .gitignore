@@ -56,6 +56,7 @@ captures/
 
 # Google Services (e.g. APIs or Firebase)
 google-services.json
+credentials.xml
 
 # Freeline
 freeline.py
