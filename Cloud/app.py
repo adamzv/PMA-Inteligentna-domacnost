@@ -1,4 +1,3 @@
-from datetime import datetime
 from flask import Flask, render_template, request, jsonify, redirect
 from apscheduler.schedulers.background import BackgroundScheduler
 from peewee import *
@@ -9,6 +8,10 @@ import requests
 import logging
 
 import ibmiotf.application
+
+db = PostgresqlDatabase(None)
+# import musí byť pod deklarovaním db
+from models import Dht, Senzor
 
 app = Flask(__name__, static_url_path='')
 
@@ -27,13 +30,14 @@ sh.setLevel(logging.DEBUG)
 
 logger.addHandler(sh)
 
-db = PostgresqlDatabase(None)
 client = None
 
 imf_push_api = ""
 imf_push_appguid = ""
 
 iot_client = None
+
+device_id = "int_domacnost1"
 
 if 'VCAP_SERVICES' in os.environ:
     vcap = json.loads(os.getenv('VCAP_SERVICES'))
@@ -84,39 +88,19 @@ elif os.path.isfile('vcap-local.json'):
         db.init('compose', dsn=postgresql_uri)
 
 
-class BaseModel(Model):
-    class Meta:
-        database = db
-
-
-class Dht(BaseModel):
-    device_id = TextField()
-    cas = DateTimeField(default=datetime.now)
-    teplota = FloatField()
-    vlhkost = FloatField()
-
-
-cas = ""
-temp = 0.0
-humidity = 0.0
-
 def command_callback(event):
     payload = json.loads(event.payload)
     if event.event == "dht":
-        global temp
-        global humidity
         temp = float(payload["d"]["t"])
         humidity = float(payload["d"]["h"])
 
-        row = Dht.create(device_id="ESP8266", teplota=temp, vlhkost=humidity)
+        row = Dht.create(device_id="int_domacnost1", teplota=temp, vlhkost=humidity)
         print(f"T:{temp} H:{humidity}")
 
 
 # V debug móde sa background task vykoná dvakrát,
 # preto som dočasne nastavil v app.run use_reloader na False
 def dht_background_task():
-    global cas
-    cas = str(datetime.now())
     command = {"senzor": "dht"}
     if iot_client is not None:
         iot_client.connect()
@@ -143,12 +127,10 @@ port = int(os.getenv('PORT', 8000))
 @app.route('/')
 def root():
     db.connect()
-    #docasne riesenie na otestovanie funkcnosti
-    db.create_tables([Dht])
-
-    #row = Dht.create(device_id="ESP8266", teplota=5, vlhkost=10)
+    # vyberie posledné, aktuálne, hodnoty teploty a vlhkosti
+    posl_hodnota = Dht.select().order_by(Dht.id.desc()).get()
     db.close()
-    return render_template('index.html', cas=cas, temp=temp, humidity=humidity)
+    return render_template('index.html', cas=posl_hodnota.cas, temp=posl_hodnota.teplota, humidity=posl_hodnota.vlhkost)
 
 
 # Endpoint na ovládanie svetla
@@ -172,7 +154,10 @@ def svetlo_route():
 # Endpoint na zistenie poslednej nameranej hodnoty teploty a vlhkosti
 @app.route('/api/dht', methods=['GET'])
 def temp_route():
-    return jsonify(responseCode=200, cas=cas, teplota=temp, vlhkost=humidity)
+    db.connect()
+    posl_hodnota = Dht.select().order_by(Dht.id.desc()).get()
+    db.close()
+    return jsonify(responseCode=200, cas=posl_hodnota.cas, teplota=posl_hodnota.teplota, vlhkost=posl_hodnota.vlhkost)
 
 
 # Endpoint slúžiaci na odomknutie/zamknutie dverí (vchodové, garážové)
