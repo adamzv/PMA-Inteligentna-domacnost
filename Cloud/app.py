@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, redirect
 from apscheduler.schedulers.background import BackgroundScheduler
+from peewee import *
 import atexit
 import os
 import json
@@ -26,7 +27,7 @@ sh.setLevel(logging.DEBUG)
 
 logger.addHandler(sh)
 
-db_name = 'iot'
+db = PostgresqlDatabase(None)
 client = None
 
 imf_push_api = ""
@@ -55,6 +56,9 @@ if 'VCAP_SERVICES' in os.environ:
             iot_client = ibmiotf.application.Client(options, logHandlers=logger.handlers)
         except Exception as e:
             print(e)
+    if 'compose-for-postgresql' in vcap:
+        postgresql_uri = vcap['compose-for-postgresql'][0]['credentials']['uri']
+        db.init('compose', dsn=postgresql_uri)
 elif os.path.isfile('vcap-local.json'):
     with open('vcap-local.json') as f:
         vcap = json.load(f)['VCAP_SERVICES']
@@ -76,25 +80,35 @@ elif os.path.isfile('vcap-local.json'):
             iot_client = ibmiotf.application.Client(options, logger.handlers)
         except Exception as e:
             print(e)
+        postgresql_uri = vcap['compose-for-postgresql'][0]['credentials']['uri']
+        db.init('compose', dsn=postgresql_uri)
+
+
+class BaseModel(Model):
+    class Meta:
+        database = db
+
+
+class Dht(BaseModel):
+    device_id = TextField()
+    cas = DateTimeField(default=datetime.now)
+    teplota = FloatField()
+    vlhkost = FloatField()
+
 
 cas = ""
-temp = 0
-humidity = 0
-
+temp = 0.0
+humidity = 0.0
 
 def command_callback(event):
     payload = json.loads(event.payload)
     if event.event == "dht":
         global temp
         global humidity
-        temp = int(payload["d"]["t"])
-        humidity = int(payload["d"]["h"])
+        temp = float(payload["d"]["t"])
+        humidity = float(payload["d"]["h"])
 
-        jsonDocument = {
-            "cas": cas,
-            "teplota": temp,
-            "vlhkost": humidity
-        }
+        row = Dht.create(device_id="ESP8266", teplota=temp, vlhkost=humidity)
         print(f"T:{temp} H:{humidity}")
 
 
@@ -128,6 +142,12 @@ port = int(os.getenv('PORT', 8000))
 
 @app.route('/')
 def root():
+    db.connect()
+    #docasne riesenie na otestovanie funkcnosti
+    db.create_tables([Dht])
+
+    #row = Dht.create(device_id="ESP8266", teplota=5, vlhkost=10)
+    db.close()
     return render_template('index.html', cas=cas, temp=temp, humidity=humidity)
 
 
@@ -184,7 +204,9 @@ def app_notifikacia():
             'Authorization': access,
         }
         push_payload = {
-            'message': {'alert': sprava},
+            'message': {
+                'alert': sprava
+            },
         }
         push_notification = requests.post(f'http://imfpush.eu-de.bluemix.net/imfpush/v1/apps/{imf_push_appguid}/messages',
                                           headers=push_headers, data=json.dumps(push_payload), verify=False)
