@@ -4,3 +4,4 @@ ibmiotf
 APScheduler
 requests
 peewee
+psycopg2

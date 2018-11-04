@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify, redirect
 from apscheduler.schedulers.background import BackgroundScheduler
-from peewee import *
+from models import db, Dht, Senzor
 import atexit
 import os
 import json
@@ -8,10 +8,6 @@ import requests
 import logging
 
 import ibmiotf.application
-
-db = PostgresqlDatabase(None)
-# import musí byť pod deklarovaním db
-from models import Dht, Senzor
 
 app = Flask(__name__, static_url_path='')
 

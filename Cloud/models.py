@@ -1,7 +1,7 @@
 from datetime import datetime
-from app import db
 from peewee import *
 
+db = PostgresqlDatabase(None)
 
 class BaseModel(Model):
     class Meta:
