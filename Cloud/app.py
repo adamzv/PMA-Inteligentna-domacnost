@@ -166,7 +166,7 @@ def svetlo_route():
         else:
             iot_client.connect()
             iot_client.publishCommand(device_type, device_id, "svetlo", "json", response)
-        return jsonify(responseCode=200, status="ok")
+            return jsonify(responseCode=200, status="ok")
     else:
         return jsonify(responseCode=400, status="zlý request")
 

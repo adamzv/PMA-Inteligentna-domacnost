@@ -28,6 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
         request.open("POST", "/api/alarm");
 
         request.onload = () => {
+            let response = JSON.parse(request.responseText);
+            document.querySelector("#vysledok").innerHTML = response["status"];
         };
 
         request.setRequestHeader("Content-Type", "application/json");
@@ -42,10 +44,28 @@ document.addEventListener("DOMContentLoaded", () => {
         request.open("POST", "/api/dvere");
 
         request.onload = () => {
+            let response = JSON.parse(request.responseText);
+            document.querySelector("#vysledok").innerHTML = response["status"];
         };
 
         request.setRequestHeader("Content-Type", "application/json");
         request.send(sprava);
+        return false;
+    };
+    document.querySelector("#led").onsubmit = () => {
+        const request = new XMLHttpRequest();
+        const select = document.querySelector("#miestnost");
+        const status = document.querySelector("#status");
+
+        request.open("POST", "/api/svetlo");
+
+        request.onload = () => {
+            let response = JSON.parse(request.responseText);
+            document.querySelector("#vysledok").innerHTML = response["status"];
+        };
+
+        request.setRequestHeader("Content-Type", "application/json");
+        request.send(JSON.stringify({"senzor": "led", "miestnost": select.value, "status": status.value}));
         return false;
     };
 });;

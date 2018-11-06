@@ -29,7 +29,6 @@
             <input id="heslo" autocomplete="off" placeholder="Heslo" type="password">
             <input type="submit" value="Poslať notifikáciu">
         </form>
-        <h5 id="vysledok"></h5>
         <form id="alarm">
             <select id="zapnut" name="zapnut">
                 <option value="on">On</option>
@@ -44,6 +43,22 @@
             </select>
             <input type="submit" value="Otvoriť/zatvoriť dvere">
         </form>
+        <form id="led">
+            <select id="miestnost">
+                <option value="1">1 Obývačka</option>
+                <option value="2">2 Kuchyňa</option>
+                <option value="3">3 Kúpeľňa</option>
+                <option value="4">4 Spálňa</option>
+                <option value="5">5 2.izba</option>
+                <option value="6">6 Garáž</option>
+            </select>
+            <select id="status">
+                <option value="on">On</option>
+                <option value="off">Off</option>
+            </select>
+            <input type="submit" value="Zapnúť/vypnúť svetlo">
+        </form>
+        <h5 id="vysledok"></h5>
     </div>
     <footer class="footer">
         <div class="container">
