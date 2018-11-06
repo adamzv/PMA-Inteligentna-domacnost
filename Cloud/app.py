@@ -32,6 +32,7 @@ imf_push_appguid = ""
 iot_client = None
 
 device_id = "int_domacnost1"
+device_type = "ESP8266"
 
 if 'VCAP_SERVICES' in os.environ:
     vcap = json.loads(os.getenv('VCAP_SERVICES'))
@@ -90,10 +91,16 @@ def event_callback(event):
         # Zapíše vlhkosť a teplotu do databázy
         Dht.create(device_id="int_domacnost1", teplota=temp, vlhkost=humidity)
         print(f"T:{temp} H:{humidity}")
+    if event.event == "led":
+        print(payload)
+        # TODO
     if event.event == "pir":
         print(payload)
         sprava = "Detegovaný pohyb " + str(datetime.now())[0:16]
         poslat_notifikaciu(imf_push_api, imf_push_appguid, sprava)
+    if event.event == "servo":
+        print(payload)
+        # TODO
 
 
 # V debug móde sa background task vykoná dvakrát,
@@ -102,7 +109,7 @@ def dht_background_command():
     command = {"senzor": "dht"}
     if iot_client is not None:
         iot_client.connect()
-        iot_client.publishCommand("ESP8266", "int_domacnost1", "dht", "json", command)
+        iot_client.publishCommand(device_type, "int_domacnost1", "dht", "json", command)
 
 
 if iot_client is not None:
@@ -113,9 +120,12 @@ if iot_client is not None:
     iot_client.subscribeToDeviceCommands()
 
     iot_client.subscribeToDeviceEvents(event="dht")
+    iot_client.subscribeToDeviceEvents(event="svetlo")
     iot_client.subscribeToDeviceEvents(event="pir")
+    iot_client.subscribeToDeviceEvents(event="servo")
 
-
+# BackgroundScheduler, ktorý každých 10 minút pošle command
+# na získanie aktuálnych hodnôt teploty a vlhkosti
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=dht_background_command, trigger="interval", seconds=600)
 scheduler.start()
@@ -127,11 +137,20 @@ port = int(os.getenv('PORT', 8000))
 
 @app.route('/')
 def root():
-    db.connect()
     # vyberie posledné, aktuálne, hodnoty teploty a vlhkosti
+    db.connect()
     posl_hodnota = Dht.select().order_by(Dht.id.desc()).get()
     db.close()
     return render_template('index.html', cas=posl_hodnota.cas, temp=posl_hodnota.teplota, humidity=posl_hodnota.vlhkost)
+
+
+# Endpoint na zistenie poslednej nameranej hodnoty teploty a vlhkosti
+@app.route('/api/dht', methods=['GET'])
+def temp_route():
+    db.connect()
+    posl_hodnota = Dht.select().order_by(Dht.id.desc()).get()
+    db.close()
+    return jsonify(responseCode=200, cas=posl_hodnota.cas, teplota=posl_hodnota.teplota, vlhkost=posl_hodnota.vlhkost)
 
 
 # Endpoint na ovládanie svetla
@@ -146,19 +165,10 @@ def svetlo_route():
             return jsonify(responseCode=503, status="watson iot neodpovedá")
         else:
             iot_client.connect()
-            iot_client.publishCommand("ESP8266", device_id, "svetlo", "json", response)
+            iot_client.publishCommand(device_type, device_id, "svetlo", "json", response)
         return jsonify(responseCode=200, status="ok")
     else:
         return jsonify(responseCode=400, status="zlý request")
-
-
-# Endpoint na zistenie poslednej nameranej hodnoty teploty a vlhkosti
-@app.route('/api/dht', methods=['GET'])
-def temp_route():
-    db.connect()
-    posl_hodnota = Dht.select().order_by(Dht.id.desc()).get()
-    db.close()
-    return jsonify(responseCode=200, cas=posl_hodnota.cas, teplota=posl_hodnota.teplota, vlhkost=posl_hodnota.vlhkost)
 
 
 # Endpoint na nastavenie alarmu
@@ -167,7 +177,6 @@ def alarm_route():
     # TODO 1 kontrola vstupných dát (on/off), aby sme nezapínali už zapnutý alarm
     # {"senzor": "pir", "status": "on/off"}
     response = request.get_json(silent=True)
-
     if response is not None:
         if iot_client is None:
             return jsonify(responseCode=503, status="watson iot neodpovedá")
@@ -175,7 +184,7 @@ def alarm_route():
             # TODO tu bude kontrolovat status zariadenia
             status = response["status"]
             iot_client.connect()
-            iot_client.publishCommand("ESP8266", device_id, "svetlo", "json", response)
+            iot_client.publishCommand(device_type, device_id, "pir", "json", response)
             return jsonify(responseCode=200, status="ok")
     else:
         return jsonify(responseCode=400, status="zlý request")
@@ -184,9 +193,22 @@ def alarm_route():
 # Endpoint slúžiaci na odomknutie/zamknutie dverí (vchodové, garážové)
 @app.route('/api/dvere', methods=['POST'])
 def dvere_route():
-    return jsonify("TODO")
+    # TODO 2 kontrola vstupných dát (on/off), aby sme neotvárali už otvorené dvere
+    # {"senzor": "servo", "hodnota": "dvere/garaz", "status": "on/off"}
+    response = request.get_json(silent=True)
+    if response is not None:
+        if iot_client is None:
+            return jsonify(responseCode=503, status="watson iot neodpovedá")
+        else:
+            # TODO dokoncit kontrolu
+            iot_client.connect()
+            iot_client.publishCommand(device_type, device_id, "servo", "json", response)
+            return jsonify(responseCode=200, status="ok")
+    else:
+        return jsonify(responseCode=400, status="zlý request")
 
 
+# Dočasný endpoint slúžiaci na testovanie notifikácii
 @app.route('/api/notifikacia', methods=['POST'])
 def app_notifikacia():
     sprava = request.form.get("sprava")
