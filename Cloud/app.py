@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, redirect
 from apscheduler.schedulers.background import BackgroundScheduler
 from models import db, Dht, Senzor
 from helpers import poslat_notifikaciu
+from datetime import datetime
 import atexit
 import os
 import json
@@ -25,8 +26,6 @@ sh.setFormatter(shFormatter)
 sh.setLevel(logging.DEBUG)
 
 logger.addHandler(sh)
-
-client = None
 
 imf_push_api = ""
 imf_push_appguid = ""
@@ -84,16 +83,18 @@ elif os.path.isfile('vcap-local.json'):
         db.init('compose', dsn=postgresql_uri)
 
 
-def command_callback(event):
+def event_callback(event):
     payload = json.loads(event.payload)
     if event.event == "dht":
         temp = float(payload["d"]["t"])
         humidity = float(payload["d"]["h"])
-
-        row = Dht.create(device_id="int_domacnost1", teplota=temp, vlhkost=humidity)
+        # Zapíše vlhkosť a teplotu do databázy
+        Dht.create(device_id="int_domacnost1", teplota=temp, vlhkost=humidity)
         print(f"T:{temp} H:{humidity}")
     if event.event == "pir":
-        print()
+        print(payload)
+        sprava = "Detegovaný pohyb " + str(datetime.now())[0:16]
+        poslat_notifikaciu(imf_push_api, imf_push_appguid, sprava)
 
 
 # V debug móde sa background task vykoná dvakrát,
@@ -108,7 +109,7 @@ def dht_background_task():
 if iot_client is not None:
     iot_client.setKeepAliveInterval(60)
     iot_client.connect()
-    iot_client.deviceEventCallback = command_callback
+    iot_client.deviceEventCallback = event_callback
 
     iot_client.subscribeToDeviceCommands()
 
