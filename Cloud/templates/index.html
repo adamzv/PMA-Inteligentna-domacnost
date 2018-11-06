@@ -15,32 +15,7 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelector("#notifikacia").onsubmit = () => {
-                const request = new XMLHttpRequest();
-                const sprava = document.querySelector("#text").value;
-                const heslo = document.querySelector("#heslo").value;
-                request.open("POST", "/api/notifikacia");
-
-                request.onload = () => {
-                    let response = JSON.parse(request.responseText);
-                    if (parseInt(response, 10) === 202) {
-                        document.querySelector("#vysledok").innerHTML = "Správa bola odoslaná.";
-                    } else {
-                        document.querySelector("#vysledok").innerHTML = "Niekde nastala chyba.";
-                    }
-                };
-
-                const data = new FormData();
-                data.append("sprava", sprava);
-                data.append("heslo", heslo);
-
-                request.send(data);
-                return false;
-            };
-        });
-    </script>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </head>
 
 <body>
@@ -49,12 +24,26 @@
         <h3>TODO</h3>
         <h5>Čas: {{ cas }} | Teplota: {{ temp }}, Vlhkosť: {{ humidity }}</h5>
         <!-- Dočasné testovanie notifikácii -->
-        <form id="notifikacia">
+        <form id="notifikacia" method="post">
             <input id="text" autocomplete="off" autofocus placeholder="Správa" type="text">
             <input id="heslo" autocomplete="off" placeholder="Heslo" type="password">
             <input type="submit" value="Poslať notifikáciu">
         </form>
         <h5 id="vysledok"></h5>
+        <form id="alarm">
+            <select id="zapnut" name="zapnut">
+                <option value="on">On</option>
+                <option value="off">Off</option>
+            </select>
+            <input type="submit" value="Zapnúť/vypnúť alarm">
+        </form>
+        <form id="dvere">
+            <select id="otvorit" name="otvorit">
+                <option value="on">On</option>
+                <option value="off">Off</option>
+            </select>
+            <input type="submit" value="Otvoriť/zatvoriť dvere">
+        </form>
     </div>
     <footer class="footer">
         <div class="container">

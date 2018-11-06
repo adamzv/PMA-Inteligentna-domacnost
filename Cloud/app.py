@@ -183,6 +183,7 @@ def alarm_route():
         else:
             # TODO tu bude kontrolovat status zariadenia
             status = response["status"]
+            print(status)
             iot_client.connect()
             iot_client.publishCommand(device_type, device_id, "pir", "json", response)
             return jsonify(responseCode=200, status="ok")
@@ -200,6 +201,7 @@ def dvere_route():
         if iot_client is None:
             return jsonify(responseCode=503, status="watson iot neodpovedá")
         else:
+            print(response["hodnota"], response["status"])
             # TODO dokoncit kontrolu
             iot_client.connect()
             iot_client.publishCommand(device_type, device_id, "servo", "json", response)
