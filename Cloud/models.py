@@ -3,6 +3,7 @@ from peewee import *
 
 db = PostgresqlDatabase(None)
 
+
 class BaseModel(Model):
     class Meta:
         database = db
