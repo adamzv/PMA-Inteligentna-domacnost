@@ -3,7 +3,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from models import db, Dht, Senzor
 from helpers import poslat_notifikaciu
 from datetime import datetime
-import atexit
 import os
 import json
 import logging
@@ -99,7 +98,7 @@ def event_callback(event):
 
 # V debug móde sa background task vykoná dvakrát,
 # preto som dočasne nastavil v app.run use_reloader na False
-def dht_background_task():
+def dht_background_command():
     command = {"senzor": "dht"}
     if iot_client is not None:
         iot_client.connect()
@@ -118,7 +117,7 @@ if iot_client is not None:
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=dht_background_task, trigger="interval", seconds=600)
+scheduler.add_job(func=dht_background_command, trigger="interval", seconds=600)
 scheduler.start()
 
 # On IBM Cloud Cloud Foundry, get the port number from the environment variable PORT
@@ -140,14 +139,14 @@ def root():
 def svetlo_route():
     # {"senzor": "led", "miestnost": cislo_miestnosti, "status": "on/off"}
     # nastav silent na True, v prípade, že zlyhá json parse vráti None
-    command = request.get_json(silent=True)
+    response = request.get_json(silent=True)
 
-    if command is not None:
+    if response is not None:
         if iot_client is None:
             return jsonify(responseCode=503, status="watson iot neodpovedá")
         else:
             iot_client.connect()
-            iot_client.publishCommand("ESP8266", "int_domacnost1", "svetlo", "json", command)
+            iot_client.publishCommand("ESP8266", device_id, "svetlo", "json", response)
         return jsonify(responseCode=200, status="ok")
     else:
         return jsonify(responseCode=400, status="zlý request")
@@ -160,6 +159,26 @@ def temp_route():
     posl_hodnota = Dht.select().order_by(Dht.id.desc()).get()
     db.close()
     return jsonify(responseCode=200, cas=posl_hodnota.cas, teplota=posl_hodnota.teplota, vlhkost=posl_hodnota.vlhkost)
+
+
+# Endpoint na nastavenie alarmu
+@app.route('/api/alarm', methods=['POST'])
+def alarm_route():
+    # TODO 1 kontrola vstupných dát (on/off), aby sme nezapínali už zapnutý alarm
+    # {"senzor": "pir", "status": "on/off"}
+    response = request.get_json(silent=True)
+
+    if response is not None:
+        if iot_client is None:
+            return jsonify(responseCode=503, status="watson iot neodpovedá")
+        else:
+            # TODO tu bude kontrolovat status zariadenia
+            status = response["status"]
+            iot_client.connect()
+            iot_client.publishCommand("ESP8266", device_id, "svetlo", "json", response)
+            return jsonify(responseCode=200, status="ok")
+    else:
+        return jsonify(responseCode=400, status="zlý request")
 
 
 # Endpoint slúžiaci na odomknutie/zamknutie dverí (vchodové, garážové)
@@ -177,12 +196,6 @@ def app_notifikacia():
         return jsonify(status_code)
     else:
         return jsonify(400)
-
-
-@atexit.register
-def shutdown():
-    if client:
-        client.disconnect()
 
 
 if __name__ == '__main__':
