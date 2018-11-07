@@ -3,7 +3,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from peewee import DoesNotExist
 
 from models import db, Dht, Senzor
-from helpers import poslat_notifikaciu
+from helpers import poslat_notifikaciu, vrat_cislo_dveri
 from datetime import datetime
 import os
 import json
@@ -156,9 +156,9 @@ def temp_route():
 
 
 # Endpoint na ovládanie svetla
+# {"senzor": "led", "miestnost": cislo_miestnosti, "status": "on/off"}
 @app.route('/api/svetlo', methods=['POST'])
 def svetlo_route():
-    # {"senzor": "led", "miestnost": cislo_miestnosti, "status": "on/off"}
     # nastav silent na True, v prípade, že zlyhá json parse vráti None
     response = request.get_json(silent=True)
 
@@ -186,10 +186,9 @@ def svetlo_route():
 
 
 # Endpoint na nastavenie alarmu
+# {"senzor": "pir", "status": "on/off"}
 @app.route('/api/alarm', methods=['POST'])
 def alarm_route():
-    # TODO 1 kontrola vstupných dát (on/off), aby sme nezapínali už zapnutý alarm
-    # {"senzor": "pir", "status": "on/off"}
     response = request.get_json(silent=True)
     if response is not None:
         if iot_client is None:
@@ -206,19 +205,27 @@ def alarm_route():
 
 
 # Endpoint slúžiaci na odomknutie/zamknutie dverí (vchodové, garážové)
+# {"senzor": "servo", "hodnota": "dvere/garaz", "status": "on/off"}
 @app.route('/api/dvere', methods=['POST'])
 def dvere_route():
-    # TODO 2 kontrola vstupných dát (on/off), aby sme neotvárali už otvorené dvere
-    # {"senzor": "servo", "hodnota": "dvere/garaz", "status": "on/off"}
     response = request.get_json(silent=True)
     if response is not None:
         if iot_client is None:
             return jsonify(responseCode=503, status='watson iot neodpovedá')
         else:
-            print(response['hodnota'], response['status'])
-            # TODO dokoncit kontrolu
-            iot_client.connect()
-            iot_client.publishCommand(device_type, device_id, 'servo', 'json', response)
+            try:
+                dvere_int = vrat_cislo_dveri(response['hodnota'])
+                dvere = Senzor.get(Senzor.device_id == device_id, Senzor.typ_senzoru == 'servo', Senzor.miestnost == dvere_int)
+            except DoesNotExist:
+                return jsonify(responseCode=400, status=f'niektorá hodnota je zlá: {response["senzor"]}, {response["hodnota"]}')
+            else:
+                if (response['status'] == 'on' and dvere.status == 'off') or (response['status'] == 'off' and dvere.status == 'on'):
+                    dvere.status = response['status']
+                    dvere.save()
+                    iot_client.connect()
+                    iot_client.publishCommand(device_type, device_id, 'servo', 'json', response)
+                else:
+                    return jsonify(responseCode=400, status=f'požiadavka: {response["status"]}, stav dverí: {dvere.status}')
             return jsonify(responseCode=200, status='ok')
     else:
         return jsonify(responseCode=400, status='zlý request')
@@ -229,7 +236,7 @@ def dvere_route():
 def app_notifikacia():
     sprava = request.form.get('sprava')
     heslo = request.form.get('heslo')
-    if heslo == 'piroskovci': # bezpečné heslo
+    if heslo == device_id:  # bezpečné heslo :)
         status_code = poslat_notifikaciu(imf_push_api, imf_push_appguid, sprava)
         return jsonify(status_code)
     else:

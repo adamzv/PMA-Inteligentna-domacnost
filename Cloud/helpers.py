@@ -28,3 +28,13 @@ def poslat_notifikaciu(apikey, appguid, sprava):
     push_notification = requests.post(f'http://imfpush.eu-de.bluemix.net/imfpush/v1/apps/{appguid}/messages',
                                       headers=push_headers, data=json.dumps(push_payload), verify=False)
     return push_notification.status_code
+
+
+# Dvere sú v db reprezentované záporným číslom, číslo 0 znamená zlý vstup
+def vrat_cislo_dveri(dvere):
+    if dvere == 'dvere':
+        return -1
+    elif dvere == 'garaz':
+        return -2
+    else:
+        return 0
