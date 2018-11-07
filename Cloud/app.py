@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, jsonify, redirect
 from apscheduler.schedulers.background import BackgroundScheduler
+from peewee import DoesNotExist
+
 from models import db, Dht, Senzor
 from helpers import poslat_notifikaciu
 from datetime import datetime
@@ -164,8 +166,20 @@ def svetlo_route():
         if iot_client is None:
             return jsonify(responseCode=503, status="watson iot neodpovedá")
         else:
-            iot_client.connect()
-            iot_client.publishCommand(device_type, device_id, "svetlo", "json", response)
+            if response["senzor"] == "led":
+                try:
+                    led = Senzor.get(Senzor.device_id == device_id,
+                                     Senzor.typ_senzoru == "led", Senzor.miestnost == int(response["miestnost"]))
+                except DoesNotExist:
+                    return jsonify(responseCode=400, status=f"miestnosť {response['miestnost']} neexistuje")
+                else:
+                    if (response["status"] == "on" and led.status == "off") or (response["status"] == "off" and led.status == "on"):
+                        led.status = response["status"]
+                        led.save()
+                        iot_client.connect()
+                        iot_client.publishCommand(device_type, device_id, "svetlo", "json", response)
+                    else:
+                        return jsonify(responseCode=400, status=f"požiadavka: {response['status']}, stav led: {led.status}")
             return jsonify(responseCode=200, status="ok")
     else:
         return jsonify(responseCode=400, status="zlý request")
