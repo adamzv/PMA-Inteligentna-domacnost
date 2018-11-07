@@ -194,11 +194,19 @@ def alarm_route():
         if iot_client is None:
             return jsonify(responseCode=503, status='watson iot neodpovedá')
         else:
-            # TODO tu bude kontrolovat status zariadenia
-            status = response['status']
-            print(status)
-            iot_client.connect()
-            iot_client.publishCommand(device_type, device_id, 'pir', 'json', response)
+            if response['senzor'] == 'pir':
+                try:
+                    pir = Senzor.get(Senzor.device_id == device_id, Senzor.typ_senzoru == 'pir')
+                except DoesNotExist:
+                    return jsonify(responseCode=400, status='pir senzor neexistuje')
+                else:
+                    if (response['status'] == 'on' and pir.status == 'off') or (response['status'] == 'off' and pir.status == 'on'):
+                        pir.status = response['status']
+                        pir.save()
+                        iot_client.connect()
+                        iot_client.publishCommand(device_type, device_id, 'pir', 'json', response)
+                    else:
+                        return jsonify(responseCode=400, status=f'požiadavka: {response["status"]}, stav pir: {pir.status}')
             return jsonify(responseCode=200, status='ok')
     else:
         return jsonify(responseCode=400, status='zlý request')
