@@ -1,5 +1,4 @@
 package com.example.android.pma_inteligentna_domacnost;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -17,8 +16,11 @@ public class PushReceiverFragment extends DialogFragment {
      * @param message Message contents of the Alert dialog.
      * @return The constructed AlertDialogFragment.
      */
+
+
     public static PushReceiverFragment newInstance(String title, String message) {
         PushReceiverFragment frag = new PushReceiverFragment();
+
         Bundle args = new Bundle();
 
         args.putString("title", title);
@@ -27,6 +29,8 @@ public class PushReceiverFragment extends DialogFragment {
         frag.setArguments(args);
         return frag;
     }
+
+
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -44,4 +48,9 @@ public class PushReceiverFragment extends DialogFragment {
                         }
                 ).create();
     }
+
+
+
+
+
 }
