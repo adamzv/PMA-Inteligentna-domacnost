@@ -17,7 +17,7 @@ app = Flask(__name__, static_url_path='')
 # ktorý bude vytvárať .log súbory každého pripojenia/odpojenia.
 # Preto som si vytvoril vlastný log handler, ktorý nebude vytvárať súbory, pretože sú momentálne
 # nepotrebné.
-logger = logging.getLogger("app.py")
+logger = logging.getLogger('app.py')
 logger.setLevel(logging.INFO)
 
 shFormatter = logging.Formatter('%(asctime)-25s %(name)-25s ' + ' %(levelname)-7s %(message)s')
@@ -28,13 +28,13 @@ sh.setLevel(logging.DEBUG)
 
 logger.addHandler(sh)
 
-imf_push_api = ""
-imf_push_appguid = ""
+imf_push_api = ''
+imf_push_appguid = ''
 
 iot_client = None
 
-device_id = "int_domacnost1"
-device_type = "ESP8266"
+device_id = 'int_domacnost1'
+device_type = 'ESP8266'
 
 if 'VCAP_SERVICES' in os.environ:
     vcap = json.loads(os.getenv('VCAP_SERVICES'))
@@ -49,10 +49,10 @@ if 'VCAP_SERVICES' in os.environ:
         imf_push_appguid = vcap['imfpush'][0]['credentials']['appGuid']
         try:
             options = {
-                "org": iot_org,
-                "auth-key": iot_auth_key,
-                "auth-token": iot_auth_token,
-                "clean-session": "true"
+                'org': iot_org,
+                'auth-key': iot_auth_key,
+                'auth-token': iot_auth_token,
+                'clean-session': 'true'
             }
             iot_client = ibmiotf.application.Client(options, logHandlers=logger.handlers)
         except Exception as e:
@@ -73,10 +73,10 @@ elif os.path.isfile('vcap-local.json'):
         imf_push_appguid = vcap['imfpush'][0]['credentials']['appGuid']
         try:
             options = {
-                "org": iot_org,
-                "auth-key": iot_auth_key,
-                "auth-token": iot_auth_token,
-                "clean-session": "true"
+                'org': iot_org,
+                'auth-key': iot_auth_key,
+                'auth-token': iot_auth_token,
+                'clean-session': 'true'
             }
             iot_client = ibmiotf.application.Client(options, logger.handlers)
         except Exception as e:
@@ -87,20 +87,20 @@ elif os.path.isfile('vcap-local.json'):
 
 def event_callback(event):
     payload = json.loads(event.payload)
-    if event.event == "dht":
-        temp = float(payload["d"]["t"])
-        humidity = float(payload["d"]["h"])
+    if event.event == 'dht':
+        temp = float(payload['d']['t'])
+        humidity = float(payload['d']['h'])
         # Zapíše vlhkosť a teplotu do databázy
-        Dht.create(device_id="int_domacnost1", teplota=temp, vlhkost=humidity)
-        print(f"T:{temp} H:{humidity}")
-    if event.event == "led":
+        Dht.create(device_id='int_domacnost1', teplota=temp, vlhkost=humidity)
+        print(f'T:{temp} H:{humidity}')
+    if event.event == 'led':
         print(payload)
         # TODO
-    if event.event == "pir":
+    if event.event == 'pir':
         print(payload)
-        sprava = "Detegovaný pohyb " + str(datetime.now())[0:16]
+        sprava = 'Detegovaný pohyb ' + str(datetime.now())[0:16]
         poslat_notifikaciu(imf_push_api, imf_push_appguid, sprava)
-    if event.event == "servo":
+    if event.event == 'servo':
         print(payload)
         # TODO
 
@@ -108,10 +108,10 @@ def event_callback(event):
 # V debug móde sa background task vykoná dvakrát,
 # preto som dočasne nastavil v app.run use_reloader na False
 def dht_background_command():
-    command = {"senzor": "dht"}
+    command = {'senzor': 'dht'}
     if iot_client is not None:
         iot_client.connect()
-        iot_client.publishCommand(device_type, "int_domacnost1", "dht", "json", command)
+        iot_client.publishCommand(device_type, 'int_domacnost1', 'dht', 'json', command)
 
 
 if iot_client is not None:
@@ -121,15 +121,15 @@ if iot_client is not None:
 
     iot_client.subscribeToDeviceCommands()
 
-    iot_client.subscribeToDeviceEvents(event="dht")
-    iot_client.subscribeToDeviceEvents(event="svetlo")
-    iot_client.subscribeToDeviceEvents(event="pir")
-    iot_client.subscribeToDeviceEvents(event="servo")
+    iot_client.subscribeToDeviceEvents(event='dht')
+    iot_client.subscribeToDeviceEvents(event='svetlo')
+    iot_client.subscribeToDeviceEvents(event='pir')
+    iot_client.subscribeToDeviceEvents(event='servo')
 
 # BackgroundScheduler, ktorý každých 10 minút pošle command
 # na získanie aktuálnych hodnôt teploty a vlhkosti
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=dht_background_command, trigger="interval", seconds=600)
+scheduler.add_job(func=dht_background_command, trigger='interval', seconds=600)
 scheduler.start()
 
 # On IBM Cloud Cloud Foundry, get the port number from the environment variable PORT
@@ -164,25 +164,25 @@ def svetlo_route():
 
     if response is not None:
         if iot_client is None:
-            return jsonify(responseCode=503, status="watson iot neodpovedá")
+            return jsonify(responseCode=503, status='watson iot neodpovedá')
         else:
-            if response["senzor"] == "led":
+            if response['senzor'] == 'led':
                 try:
                     led = Senzor.get(Senzor.device_id == device_id,
-                                     Senzor.typ_senzoru == "led", Senzor.miestnost == int(response["miestnost"]))
+                                     Senzor.typ_senzoru == 'led', Senzor.miestnost == int(response['miestnost']))
                 except DoesNotExist:
-                    return jsonify(responseCode=400, status=f"miestnosť {response['miestnost']} neexistuje")
+                    return jsonify(responseCode=400, status=f'miestnosť {response["miestnost"]} neexistuje')
                 else:
-                    if (response["status"] == "on" and led.status == "off") or (response["status"] == "off" and led.status == "on"):
-                        led.status = response["status"]
+                    if (response['status'] == 'on' and led.status == 'off') or (response['status'] == 'off' and led.status == 'on'):
+                        led.status = response['status']
                         led.save()
                         iot_client.connect()
-                        iot_client.publishCommand(device_type, device_id, "svetlo", "json", response)
+                        iot_client.publishCommand(device_type, device_id, 'svetlo', 'json', response)
                     else:
-                        return jsonify(responseCode=400, status=f"požiadavka: {response['status']}, stav led: {led.status}")
-            return jsonify(responseCode=200, status="ok")
+                        return jsonify(responseCode=400, status=f'požiadavka: {response["status"]}, stav led: {led.status}')
+            return jsonify(responseCode=200, status='ok')
     else:
-        return jsonify(responseCode=400, status="zlý request")
+        return jsonify(responseCode=400, status='zlý request')
 
 
 # Endpoint na nastavenie alarmu
@@ -193,16 +193,16 @@ def alarm_route():
     response = request.get_json(silent=True)
     if response is not None:
         if iot_client is None:
-            return jsonify(responseCode=503, status="watson iot neodpovedá")
+            return jsonify(responseCode=503, status='watson iot neodpovedá')
         else:
             # TODO tu bude kontrolovat status zariadenia
-            status = response["status"]
+            status = response['status']
             print(status)
             iot_client.connect()
-            iot_client.publishCommand(device_type, device_id, "pir", "json", response)
-            return jsonify(responseCode=200, status="ok")
+            iot_client.publishCommand(device_type, device_id, 'pir', 'json', response)
+            return jsonify(responseCode=200, status='ok')
     else:
-        return jsonify(responseCode=400, status="zlý request")
+        return jsonify(responseCode=400, status='zlý request')
 
 
 # Endpoint slúžiaci na odomknutie/zamknutie dverí (vchodové, garážové)
@@ -213,23 +213,23 @@ def dvere_route():
     response = request.get_json(silent=True)
     if response is not None:
         if iot_client is None:
-            return jsonify(responseCode=503, status="watson iot neodpovedá")
+            return jsonify(responseCode=503, status='watson iot neodpovedá')
         else:
-            print(response["hodnota"], response["status"])
+            print(response['hodnota'], response['status'])
             # TODO dokoncit kontrolu
             iot_client.connect()
-            iot_client.publishCommand(device_type, device_id, "servo", "json", response)
-            return jsonify(responseCode=200, status="ok")
+            iot_client.publishCommand(device_type, device_id, 'servo', 'json', response)
+            return jsonify(responseCode=200, status='ok')
     else:
-        return jsonify(responseCode=400, status="zlý request")
+        return jsonify(responseCode=400, status='zlý request')
 
 
 # Dočasný endpoint slúžiaci na testovanie notifikácii
 @app.route('/api/notifikacia', methods=['POST'])
 def app_notifikacia():
-    sprava = request.form.get("sprava")
-    heslo = request.form.get("heslo")
-    if heslo == "piroskovci":
+    sprava = request.form.get('sprava')
+    heslo = request.form.get('heslo')
+    if heslo == 'piroskovci': # bezpečné heslo
         status_code = poslat_notifikaciu(imf_push_api, imf_push_appguid, sprava)
         return jsonify(status_code)
     else:
