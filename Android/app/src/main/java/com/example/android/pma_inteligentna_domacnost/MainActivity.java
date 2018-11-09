@@ -1,8 +1,10 @@
 package com.example.android.pma_inteligentna_domacnost;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         notificationManager = NotificationManagerCompat.from(this);
 
         // Core SDK must be initialized to interact with Bluemix Mobile services.
@@ -132,6 +135,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void submitOrder(View view) {
         Intent ganesh = new Intent(this, Svetlo.class);
+        startActivity(ganesh);
+    }
+
+    public void submitOrder2(View view) {
+        Intent ganesh = new Intent(this, Teplota.class);
         startActivity(ganesh);
     }
 

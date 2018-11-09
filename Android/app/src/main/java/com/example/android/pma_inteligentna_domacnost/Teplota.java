@@ -1,10 +1,16 @@
 package com.example.android.pma_inteligentna_domacnost;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.view.View;
 import android.widget.TextView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -14,18 +20,24 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class Svetlo extends AppCompatActivity {
+public class Teplota extends AppCompatActivity {
 
     private TextView mTextViewResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_svetlo);
+        setContentView(R.layout.activity_teplota);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+        submitOrderTep();
     }
 
     public void submitOrder(View view) {
+        Intent ganesh = new Intent(this, Svetlo.class);
+        startActivity(ganesh);
+    }
+
+    public void submitOrderTep() {
         mTextViewResult = findViewById(R.id.result);
 
         OkHttpClient client = new OkHttpClient();
@@ -46,12 +58,24 @@ public class Svetlo extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    final String myResponse = response.body().string();
+                    String teplota1 = "";
+                    String vlhkost1 = "";
+                    try {
+                        JSONObject t = new JSONObject(response.body().string());
+                        teplota1 = t.getString("teplota");
+                        vlhkost1 = t.getString("vlhkost");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
-                    Svetlo.this.runOnUiThread(new Runnable() {
+                    final String teplota = teplota1;
+                    final String vlhkost = vlhkost1;
+
+                    Teplota.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mTextViewResult.setText(myResponse);
+
+                            mTextViewResult.setText("Teplota:\n"+teplota+" °C\n\nVlhkosť:\n"+vlhkost+" %");
                         }
                     });
                 }
@@ -59,3 +83,4 @@ public class Svetlo extends AppCompatActivity {
         });
     }
 }
+

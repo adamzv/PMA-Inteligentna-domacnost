@@ -19,7 +19,7 @@
             android:id="@+id/svetlo"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5"
+            android:layout_weight="4"
             android:background="#1565C0">
 
         <Switch
@@ -113,7 +113,7 @@
         <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="5"
+            android:layout_weight="6"
             android:alignmentMode="alignMargins"
             android:columnCount="2"
             android:columnOrderPreserved="false"
@@ -128,8 +128,7 @@
                 android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                app:cardElevation="8dp"
-                android:onClick="submitOrder">
+                app:cardElevation="8dp">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -198,6 +197,7 @@
                 android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
+                android:onClick="submitOrder2"
                 app:cardElevation="8dp">
 
                 <LinearLayout
