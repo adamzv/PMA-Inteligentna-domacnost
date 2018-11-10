@@ -37,6 +37,11 @@ public class Teplota extends AppCompatActivity {
         startActivity(ganesh);
     }
 
+    public void submitOrder3(View view) {
+        Intent ganesh = new Intent(this, Alarm.class);
+        startActivity(ganesh);
+    }
+
     public void submitOrderTep() {
         mTextViewResult = findViewById(R.id.result);
 

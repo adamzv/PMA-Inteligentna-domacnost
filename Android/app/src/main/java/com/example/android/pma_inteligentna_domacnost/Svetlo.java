@@ -1,5 +1,6 @@
 package com.example.android.pma_inteligentna_domacnost;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,6 +24,16 @@ public class Svetlo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_svetlo);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+    }
+
+    public void submitOrder2(View view) {
+        Intent ganesh = new Intent(this, Teplota.class);
+        startActivity(ganesh);
+    }
+
+    public void submitOrder3(View view) {
+        Intent ganesh = new Intent(this, Alarm.class);
+        startActivity(ganesh);
     }
 
     public void submitOrder(View view) {

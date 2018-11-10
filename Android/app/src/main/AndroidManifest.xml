@@ -25,6 +25,7 @@
             android:name="com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPushNotificationHandler" android:theme="@android:style/Theme.NoDisplay"/>
         <activity android:name="com.example.android.pma_inteligentna_domacnost.Svetlo"></activity>
         <activity android:name="com.example.android.pma_inteligentna_domacnost.Teplota"></activity>
+        <activity android:name="com.example.android.pma_inteligentna_domacnost.Alarm"></activity>
         <service android:exported="true" android:name="com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPushIntentService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
