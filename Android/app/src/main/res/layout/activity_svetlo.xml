@@ -32,7 +32,9 @@
             android:layout_alignParentLeft="true"
             android:textColor="@android:color/white"
             android:textStyle="italic"
-            android:textSize="15dp"/>
+            android:textSize="15dp"
+            android:onClick="submitOrder"/>
+
         <Switch
             android:id="@+id/s3"
             android:layout_width="wrap_content"
@@ -45,6 +47,7 @@
             android:textColor="@android:color/white"
             android:textStyle="italic"
             android:textSize="15dp"
+            android:onClick="submitOrder"
             />
 
         <Switch
@@ -73,7 +76,8 @@
                 android:text="4. Spálňa  "
                 android:textColor="@android:color/white"
                 android:textStyle="italic"
-                android:textSize="15dp"/>
+                android:textSize="15dp"
+                android:onClick="submitOrder"/>
             <Switch
                 android:id="@+id/s5"
                 android:layout_width="wrap_content"
@@ -85,6 +89,7 @@
                 android:textColor="@android:color/white"
                 android:textStyle="italic"
                 android:textSize="15dp"
+                android:onClick="submitOrder"
                 />
 
             <Switch
