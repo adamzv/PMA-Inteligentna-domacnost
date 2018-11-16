@@ -15,105 +15,41 @@
 
 
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/svetlo"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="4"
             android:background="#1565C0">
 
-        <Switch
-            android:id="@+id/s2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="15dp"
-            android:text="2. Kuchyňa     "
-            android:layout_centerInParent="true"
-            android:layout_alignParentLeft="true"
-            android:textColor="@android:color/white"
-            android:textStyle="italic"
-            android:textSize="15dp"
-            android:onClick="submitOrder"/>
+            <RelativeLayout
+                android:id="@+id/dvere_vchodove"
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight=".50"
+                >
 
-        <Switch
-            android:id="@+id/s3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="15dp"
-            android:layout_below="@id/s2"
-            android:text="3. Kúpelňa      "
-            android:layout_centerInParent="true"
-            android:layout_alignParentLeft="true"
-            android:textColor="@android:color/white"
-            android:textStyle="italic"
-            android:textSize="15dp"
-            android:onClick="submitOrder"
-            />
+                <Switch
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true" />
 
-        <Switch
-            android:id="@+id/s1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="15dp"
-            android:text="1. Obyváčka   "
-            android:layout_above="@id/s2"
-            android:layout_centerInParent="true"
-            android:layout_alignParentLeft="true"
-            android:textColor="@android:color/white"
-            android:textStyle="italic"
-            android:textSize="15dp"
-            android:onClick="submitOrder"
-            />
+            </RelativeLayout>
 
-            <Switch
-                android:id="@+id/s4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:layout_centerInParent="true"
-                android:layout_alignParentRight="true"
-                android:layout_above="@id/s5"
-                android:text="4. Spálňa  "
-                android:textColor="@android:color/white"
-                android:textStyle="italic"
-                android:textSize="15dp"
-                android:onClick="submitOrder"/>
-            <Switch
-                android:id="@+id/s5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:layout_centerInParent="true"
-                android:layout_alignParentRight="true"
-                android:text="5. 2.izba   "
-                android:textColor="@android:color/white"
-                android:textStyle="italic"
-                android:textSize="15dp"
-                android:onClick="submitOrder"
-                />
+            <RelativeLayout
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_toRightOf="@id/dvere_vchodove"
+                android:layout_weight=".50">
 
-            <Switch
-                android:id="@+id/s6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="15dp"
-                android:layout_below="@id/s5"
-                android:layout_alignParentRight="true"
-                android:text="6. Garáž   "
-                android:textColor="@android:color/white"
-                android:textStyle="italic"
-                android:textSize="15dp"
-                android:onClick="submitOrder"
-                />
+                <Switch
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"/>
 
-            <TextView
-                android:id="@+id/result"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                />
+            </RelativeLayout>
 
-        </RelativeLayout>
+        </LinearLayout>
 
         <GridLayout
             android:layout_width="match_parent"
@@ -133,7 +69,8 @@
                 android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                app:cardElevation="8dp">
+                app:cardElevation="8dp"
+                android:onClick="submitOrder">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -167,8 +104,7 @@
                 android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                app:cardElevation="8dp"
-                android:onClick="submitOrder4">
+                app:cardElevation="8dp">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -203,8 +139,8 @@
                 android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
-                android:onClick="submitOrder2"
-                app:cardElevation="8dp">
+                app:cardElevation="8dp"
+                android:onClick="submitOrder2">
 
                 <LinearLayout
                     android:layout_width="wrap_content"

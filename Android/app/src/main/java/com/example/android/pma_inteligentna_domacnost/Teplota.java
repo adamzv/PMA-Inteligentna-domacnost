@@ -23,6 +23,7 @@ import okhttp3.Response;
 public class Teplota extends AppCompatActivity {
 
     private TextView mTextViewResult;
+    public static final String KEY_ACTIVITY_NAME = "KEY_ACTIVITY_NAME";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,14 @@ public class Teplota extends AppCompatActivity {
     }
 
     public void submitOrder3(View view) {
-        Intent ganesh = new Intent(this, Alarm.class);
+        Intent ganesh = new Intent(this, Bezpecnost.class);
+        ganesh.putExtra(KEY_ACTIVITY_NAME,"a");
+        startActivity(ganesh);
+    }
+
+    public void submitOrder4(View view) {
+        Intent ganesh = new Intent(this, Bezpecnost.class);
+        ganesh.putExtra(KEY_ACTIVITY_NAME,"b");
         startActivity(ganesh);
     }
 

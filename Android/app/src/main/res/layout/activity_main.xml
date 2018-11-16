@@ -83,6 +83,7 @@
                 android:layout_height="0dp"
                 android:layout_rowWeight="1"
                 android:layout_columnWeight="1"
+                android:onClick="submitOrder4"
                 app:cardElevation="8dp">
 
                 <LinearLayout

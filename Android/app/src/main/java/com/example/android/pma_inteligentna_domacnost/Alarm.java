@@ -2,6 +2,7 @@ package com.example.android.pma_inteligentna_domacnost;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -19,6 +20,7 @@ import okhttp3.Response;
 
 public class Alarm extends AppCompatActivity {
 
+    public static final String KEY_ACTIVITY_NAME = "KEY_ACTIVITY_NAME";
     private ImageView imgView;
     private TextView mTextViewResult;
     public static final String SHARED_PREFS = "sharedPrefs";
@@ -32,6 +34,7 @@ public class Alarm extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         loadData();
         updateViews();
         imgView = (ImageView) findViewById(R.id.alarm);
@@ -62,6 +65,12 @@ public class Alarm extends AppCompatActivity {
 
     public void submitOrder2(View view) {
         Intent ganesh = new Intent(this, Teplota.class);
+        startActivity(ganesh);
+    }
+
+    public void submitOrder4(View view) {
+        Intent ganesh = new Intent(this, Bezpecnost.class);
+        ganesh.putExtra(KEY_ACTIVITY_NAME,"b");
         startActivity(ganesh);
     }
 

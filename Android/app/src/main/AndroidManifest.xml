@@ -26,6 +26,8 @@
         <activity android:name="com.example.android.pma_inteligentna_domacnost.Svetlo"></activity>
         <activity android:name="com.example.android.pma_inteligentna_domacnost.Teplota"></activity>
         <activity android:name="com.example.android.pma_inteligentna_domacnost.Alarm"></activity>
+        <activity android:name="com.example.android.pma_inteligentna_domacnost.Bezpecnost"></activity>
+        <activity android:name="com.example.android.pma_inteligentna_domacnost.Dvere"></activity>
         <service android:exported="true" android:name="com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPPushIntentService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>

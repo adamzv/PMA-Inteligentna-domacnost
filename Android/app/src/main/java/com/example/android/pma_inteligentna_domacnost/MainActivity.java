@@ -24,6 +24,7 @@ import com.ibm.mobilefirstplatform.clientsdk.android.push.api.MFPSimplePushNotif
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String KEY_ACTIVITY_NAME = "KEY_ACTIVITY_NAME";
     private MFPPush push;
     private MFPPushNotificationListener notificationListener;
     private NotificationManagerCompat notificationManager;
@@ -144,7 +145,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void submitOrder3(View view) {
-        Intent ganesh = new Intent(this, Alarm.class);
+        Intent ganesh = new Intent(this, Bezpecnost.class);
+        ganesh.putExtra(KEY_ACTIVITY_NAME,"a");
+        startActivity(ganesh);
+    }
+
+    public void submitOrder4(View view) {
+        Intent ganesh = new Intent(this, Bezpecnost.class);
+        ganesh.putExtra(KEY_ACTIVITY_NAME,"b");
         startActivity(ganesh);
     }
 
