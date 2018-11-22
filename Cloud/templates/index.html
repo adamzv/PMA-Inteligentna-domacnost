@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inteligentná domácnosť</title>
+
+    <!-- Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/styles.css" rel="stylesheet">
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</head>
+
+<body>
+    <div class="container" id="container">
+        <h1>PMA Inteligentá domácnosť</h1>
+        <h3>TODO</h3>
+        <h5>Čas: {{ cas }} | Teplota: {{ temp }}, Vlhkosť: {{ humidity }}</h5>
+        <!-- Dočasné testovanie notifikácii -->
+        <form id="notifikacia" method="post">
+            <input id="text" autocomplete="off" autofocus placeholder="Správa" type="text">
+            <input id="heslo" autocomplete="off" placeholder="Heslo" type="password">
+            <input type="submit" value="Poslať notifikáciu">
+        </form>
+        <form id="alarm">
+            <select id="zapnut" name="zapnut">
+                <option value="on">On</option>
+                <option value="off">Off</option>
+            </select>
+            <input type="submit" value="Zapnúť/vypnúť alarm">
+        </form>
+        <form id="dvere">
+            <select id="otvorit" name="otvorit">
+                <option value="on">On</option>
+                <option value="off">Off</option>
+            </select>
+            <input type="submit" value="Otvoriť/zatvoriť dvere">
+        </form>
+        <form id="led">
+            <select id="miestnost">
+                <option value="1">1 Obývačka</option>
+                <option value="2">2 Kuchyňa</option>
+                <option value="3">3 Kúpeľňa</option>
+                <option value="4">4 Spálňa</option>
+                <option value="5">5 2.izba</option>
+                <option value="6">6 Garáž</option>
+            </select>
+            <select id="status">
+                <option value="on">On</option>
+                <option value="off">Off</option>
+            </select>
+            <input type="submit" value="Zapnúť/vypnúť svetlo">
+        </form>
+        <h5>Po testovaní nezabudnite vypnúť senzory!</h5>
+        <h5>{{ resp }}</h5>
+        <h5 id="vysledok"></h5>
+    </div>
+    <footer class="footer">
+        <div class="container">
+            <span>KI/PMA/15 projekt Inteligentná domácnosť, tím Piroškovci</span>
+        </div>
+    </footer>
+
+</body>
+
+</html>

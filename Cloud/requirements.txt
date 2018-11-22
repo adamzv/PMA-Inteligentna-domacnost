@@ -1,4 +1,6 @@
 Flask
-cloudant
 ibmiotf
 APScheduler
+requests
+peewee
+psycopg2
