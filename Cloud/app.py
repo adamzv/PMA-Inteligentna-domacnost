@@ -136,22 +136,20 @@ scheduler.start()
 # When running this app on the local machine, default the port to 8000
 port = int(os.getenv('PORT', 8000))
 
+#test
+resp = ""
 
 @app.route('/')
 def root():
     # vyberie posledné, aktuálne, hodnoty teploty a vlhkosti
-    db.connect()
     posl_hodnota = Dht.select().order_by(Dht.id.desc()).get()
-    db.close()
-    return render_template('index.html', cas=posl_hodnota.cas, temp=posl_hodnota.teplota, humidity=posl_hodnota.vlhkost)
+    return render_template('index.html', cas=posl_hodnota.cas, temp=posl_hodnota.teplota, humidity=posl_hodnota.vlhkost, resp=resp)
 
 
 # Endpoint na zistenie poslednej nameranej hodnoty teploty a vlhkosti
 @app.route('/api/dht', methods=['GET'])
 def temp_route():
-    db.connect()
     posl_hodnota = Dht.select().order_by(Dht.id.desc()).get()
-    db.close()
     return jsonify(responseCode=200, cas=posl_hodnota.cas, teplota=posl_hodnota.teplota, vlhkost=posl_hodnota.vlhkost)
 
 
@@ -190,6 +188,9 @@ def svetlo_route():
 @app.route('/api/alarm', methods=['POST'])
 def alarm_route():
     response = request.get_json(silent=True)
+    global resp
+    resp = response
+    print(response)
     if response is not None:
         if iot_client is None:
             return jsonify(responseCode=503, status='watson iot neodpovedá')
