@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#1565C0"
+        android:weightSum="10">
+
+
+
+        <RelativeLayout
+            android:id="@+id/svetlo"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="7"
+            android:background="#1565C0">
+
+            <TextView
+                android:id="@+id/text_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textSize="90dp"
+                android:letterSpacing="0.2"
+                android:textColor="@android:color/white"
+                android:text=""/>
+
+        </RelativeLayout>
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#1565C0"
+            android:layout_weight="1"
+            android:alignmentMode="alignMargins"
+            android:columnCount="3"
+            android:rowCount="4"
+            android:useDefaultMargins="true"
+            android:columnOrderPreserved="true"
+
+            >
+
+            <!-- ROW 1 -->
+
+            <!-- Column 1 -->
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1565C0">
+
+                <ImageView
+                    android:id="@+id/num_1"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/number_1"
+                    android:onClick="submitOrder"/>
+
+            </android.support.v7.widget.CardView>
+
+            <!-- Column 2 -->
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1565C0">
+
+                <ImageView
+                    android:id="@+id/num_2"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/number_2"
+                    android:onClick="submitOrder"/>
+
+            </android.support.v7.widget.CardView>
+
+            <!-- Column 3 -->
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1565C0">
+
+                <ImageView
+                    android:id="@+id/num_3"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/number_3"
+                    android:onClick="submitOrder"/>
+
+            </android.support.v7.widget.CardView>
+
+
+
+            <!-- Row 2 -->
+
+            <!-- Column 4 -->
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1565C0">
+
+                <ImageView
+                    android:id="@+id/num_4"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/number_4"
+                    android:onClick="submitOrder"/>
+
+            </android.support.v7.widget.CardView>
+
+            <!-- Column 5 -->
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1565C0">
+
+                <ImageView
+                    android:id="@+id/num_5"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/number_5"
+                    android:onClick="submitOrder"/>
+
+            </android.support.v7.widget.CardView>
+
+            <!-- Column 6 -->
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1565C0">
+
+                <ImageView
+                    android:id="@+id/num_6"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/number_6"
+                    android:onClick="submitOrder"/>
+
+            </android.support.v7.widget.CardView>
+
+
+            <!-- Row 3 -->
+
+            <!-- Column 7 -->
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1565C0">
+
+                <ImageView
+                    android:id="@+id/num_7"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/number_7"
+                    android:onClick="submitOrder"/>
+
+            </android.support.v7.widget.CardView>
+
+            <!-- Column 8 -->
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1565C0">
+
+                <ImageView
+                    android:id="@+id/num_8"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/number_8"
+                    android:onClick="submitOrder"/>
+
+            </android.support.v7.widget.CardView>
+
+            <!-- Column 9 -->
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1565C0">
+
+                <ImageView
+                    android:id="@+id/num_9"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/number_9"
+                    android:onClick="submitOrder"/>
+
+            </android.support.v7.widget.CardView>
+
+
+            <!-- Row 4 -->
+
+            <!-- Column 10 -->
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1565C0">
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/number_back"
+                    android:onClick="submitOrder2"/>
+
+            </android.support.v7.widget.CardView>
+
+            <!-- Column 11 -->
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1565C0">
+
+                <ImageView
+                    android:id="@+id/num_0"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/number_0"
+                    android:onClick="submitOrder"/>
+
+            </android.support.v7.widget.CardView>
+
+            <!-- Column 12 -->
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#1565C0">
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/number_ok"
+                    android:onClick="submitOrder3"/>
+
+            </android.support.v7.widget.CardView>
+
+        </GridLayout>
+
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
