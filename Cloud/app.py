@@ -252,5 +252,13 @@ def app_notifikacia():
         return jsonify(400)
 
 
+@app.route('/api/status')
+def status_senzorov():
+    senzory = []
+    for senzor in Senzor.select():
+        senzory.append({"id": senzor.id, "device_id": senzor.device_id, "typ_senzoru": senzor.typ_senzoru, "miestnost": senzor.miestnost, "status": senzor.status})
+    return jsonify(senzory)
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port, debug=True, use_reloader=False)
