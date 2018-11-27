@@ -23,8 +23,8 @@ public class Bezpecnost extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bezpecnost);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
-        text1 = findViewById(R.id.text_code);
 
+        text1 = findViewById(R.id.text_code);
     }
 
     public void submitOrder(View view) {
@@ -63,15 +63,14 @@ public class Bezpecnost extends AppCompatActivity {
                 zadane = zadane + "9";
                 text_pre_textView += "*";
             }
-
             text1.setText(text_pre_textView);
         }
     }
 
     public void submitOrder2(View view) {
         if (zadane.length() > 0) {
-            text_pre_textView = text_pre_textView.substring(0,text_pre_textView.length()-1);
-            zadane = zadane.substring(0,zadane.length()-1);
+            text_pre_textView = text_pre_textView.substring(0, text_pre_textView.length() - 1);
+            zadane = zadane.substring(0, zadane.length() - 1);
             text1.setText(text_pre_textView);
         }
     }
@@ -89,8 +88,7 @@ public class Bezpecnost extends AppCompatActivity {
             zadane = "";
             text_pre_textView = "";
             text1.setText(text_pre_textView);
-            Toast.makeText(this,"Nesprávne heslo!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Nesprávne heslo!", Toast.LENGTH_SHORT).show();
         }
     }
-
 }
