@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, redirect
 from apscheduler.schedulers.background import BackgroundScheduler
 from peewee import DoesNotExist
+from pytz import timezone
 
 from models import db, Dht, Senzor
 from helpers import poslat_notifikaciu, vrat_cislo_dveri
@@ -35,6 +36,8 @@ iot_client = None
 
 device_id = 'int_domacnost1'
 device_type = 'ESP8266'
+
+bratislava_pasmo = timezone("Europe/Bratislava")
 
 if 'VCAP_SERVICES' in os.environ:
     vcap = json.loads(os.getenv('VCAP_SERVICES'))
@@ -95,14 +98,15 @@ def event_callback(event):
         print(f'T:{temp} H:{humidity}')
     if event.event == 'led':
         print(payload)
-        # TODO
     if event.event == 'pir':
         print(payload)
-        sprava = 'Detegovaný pohyb ' + str(datetime.now())[0:16]
+
+        format = "%d.%m.%Y %H:%M"
+        cas = bratislava_pasmo.localize(datetime.now())
+        sprava = 'Detegovaný pohyb ' + cas.strftime(format)
         poslat_notifikaciu(imf_push_api, imf_push_appguid, sprava)
     if event.event == 'servo':
         print(payload)
-        # TODO
 
 
 # V debug móde sa background task vykoná dvakrát,
@@ -255,7 +259,7 @@ def app_notifikacia():
 @app.route('/api/status')
 def status_senzorov():
     senzory = []
-    for senzor in Senzor.select():
+    for senzor in Senzor.select().order_by(Senzor.id):
         senzory.append({"id": senzor.id, "device_id": senzor.device_id, "typ_senzoru": senzor.typ_senzoru, "miestnost": senzor.miestnost, "status": senzor.status})
     return jsonify(senzory)
 

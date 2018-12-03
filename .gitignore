@@ -118,6 +118,7 @@ obj/
 /out/
 
 # User-specific configurations
+.idea/
 .idea/caches/
 .idea/libraries/
 .idea/shelf/
@@ -451,3 +452,4 @@ pip-selfcheck.json
 
 
 # End of https://www.gitignore.io/api/flask,python,pycharm,android,androidstudio,java
+Android/.idea/runConfigurations.xml
