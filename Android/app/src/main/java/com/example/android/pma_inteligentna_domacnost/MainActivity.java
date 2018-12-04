@@ -39,14 +39,13 @@ public class MainActivity extends AppCompatActivity {
         // Core SDK must be initialized to interact with Bluemix Mobile services.
         BMSClient.getInstance().initialize(getApplicationContext(), BMSClient.REGION_GERMANY);
 
-
-
         /*
          * Initialize the Push Notifications client SDK with the App Guid and Client Secret from your Push Notifications service instance on Bluemix.
          * This enables authenticated interactions with your Push Notifications service instance.
          */
         push = MFPPush.getInstance();
         push.initialize(getApplicationContext(), getString(R.string.pushAppGuid), getString(R.string.pushClientSecret));
+
 
         /*
          * Attempt to register your Android device with your Bluemix Push Notifications service instance.
@@ -100,19 +99,16 @@ public class MainActivity extends AppCompatActivity {
         notificationListener = new MFPPushNotificationListener() {
 
             @Override
-            public void onReceive (final MFPSimplePushNotification message) {
+            public void onReceive(final MFPSimplePushNotification message) {
                 // TODO: Process the message and add your logic here.
                 android.util.Log.i("YOUR_TAG_HERE", "Received a push notification: " + message.toString());
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        android.app.DialogFragment fragment = PushReceiverFragment.newInstance("Push notification received", message.getAlert());
-                        fragment.show(getFragmentManager(), "dialog");
-                        sendOnChannel1(message.getAlert());
+                        // sendOnChannel1(message.getAlert());
                     }
                 });
             }
         };
-
     }
 
     @Override
@@ -122,8 +118,6 @@ public class MainActivity extends AppCompatActivity {
         if (push != null) {
             push.listen(notificationListener);
         }
-
-
     }
 
     @Override
@@ -132,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         if (push != null) {
             push.hold();
         }
-    }
+     }
 
     public void submitOrder(View view) {
         Intent ganesh = new Intent(this, Svetlo.class);
@@ -146,23 +140,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void submitOrder3(View view) {
         Intent ganesh = new Intent(this, Bezpecnost.class);
-        ganesh.putExtra(KEY_ACTIVITY_NAME,"a");
+        ganesh.putExtra(KEY_ACTIVITY_NAME, "a");
         startActivity(ganesh);
     }
 
     public void submitOrder4(View view) {
         Intent ganesh = new Intent(this, Bezpecnost.class);
-        ganesh.putExtra(KEY_ACTIVITY_NAME,"b");
+        ganesh.putExtra(KEY_ACTIVITY_NAME, "b");
         startActivity(ganesh);
     }
 
     public void sendOnChannel1(String imessage) {
 
         String title = "Varovanie!";
-        String message =  imessage;
+        String message = imessage;
 
         Notification notification = new NotificationCompat.Builder(this, App.CHANNEL_1_ID)
-                .setSmallIcon(R.drawable.ic_one)
+                .setSmallIcon(R.drawable.ic_wb_incandescent_black_24dp)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -170,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         notificationManager.notify(1, notification);
+
     }
-
-
 }

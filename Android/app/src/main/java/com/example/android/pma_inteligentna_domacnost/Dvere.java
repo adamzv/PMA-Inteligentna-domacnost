@@ -36,10 +36,7 @@ public class Dvere extends AppCompatActivity {
     private String hodnota;
     private String status;
 
-    public TextView mTextViewResult;
     public Switch switchDvere;
-
-    public TextView mTextViewResult2;
     public Switch switchGaraz;
 
     @Override
@@ -48,10 +45,7 @@ public class Dvere extends AppCompatActivity {
         setContentView(R.layout.activity_dvere);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
 
-        mTextViewResult = (TextView) findViewById(R.id.textik);
         switchDvere = (Switch) findViewById(R.id.idDvere);
-
-        mTextViewResult2 = (TextView) findViewById(R.id.textik2);
         switchGaraz = (Switch) findViewById(R.id.idGaraz);
 
         if (checkConnection()) getDvere();
@@ -143,11 +137,7 @@ public class Dvere extends AppCompatActivity {
                             @Override
                             public void run() {
 
-                                if (hodnota.equals("dvere")) {
-                                    mTextViewResult.setText(myResponse);
-                                } else if (hodnota.equals("garaz")) {
-                                    mTextViewResult2.setText(myResponse);
-                                }
+
 
                             }
                         });
@@ -220,9 +210,6 @@ public class Dvere extends AppCompatActivity {
                     Dvere.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
-                            mTextViewResult.setText("Miestnost: " + miestnostDvere + " \nStatus:" + statusDvere);
-                            mTextViewResult2.setText("Miestnost: " + miestnostGaraz + " \nStatus:" + statusGaraz);
 
                             if (statusDvere.equals("off")) switchDvere.setChecked(false);
                             else switchDvere.setChecked(true);

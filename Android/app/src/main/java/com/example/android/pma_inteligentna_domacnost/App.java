@@ -12,11 +12,10 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
         createNotificationChannels();
     }
 
-    private void  createNotificationChannels() {
+     private void  createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel1 = new NotificationChannel(
                     CHANNEL_1_ID,

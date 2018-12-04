@@ -38,7 +38,6 @@ public class Svetlo extends AppCompatActivity {
 
     private String cislo_miestnosti;
     private String status;
-    private TextView mTextViewResult;
 
     // Switch
     private Switch switch1;
@@ -55,7 +54,6 @@ public class Svetlo extends AppCompatActivity {
         setContentView(R.layout.activity_svetlo);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
 
-        mTextViewResult = findViewById(R.id.result);
         switch1 = findViewById(R.id.s1);
         switch2 = findViewById(R.id.s2);
         switch3 = findViewById(R.id.s3);
@@ -278,7 +276,6 @@ public class Svetlo extends AppCompatActivity {
                             @Override
                             public void run() {
 
-                                mTextViewResult.setText(myResponse + " " + cislo_miestnosti + " " + status);
                                 if (ID == R.id.s1) {
                                     if (switch1.isChecked()) switch1.setChecked(true);
                                     else switch1.setChecked(false);
