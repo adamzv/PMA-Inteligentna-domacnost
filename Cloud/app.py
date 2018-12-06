@@ -38,6 +38,7 @@ device_id = 'int_domacnost1'
 device_type = 'ESP8266'
 
 bratislava_pasmo = timezone("Europe/Bratislava")
+cas_format = "%d.%m.%Y %H:%M"
 
 if 'VCAP_SERVICES' in os.environ:
     vcap = json.loads(os.getenv('VCAP_SERVICES'))
@@ -101,9 +102,9 @@ def event_callback(event):
     if event.event == 'pir':
         print(payload)
 
-        format = "%d.%m.%Y %H:%M"
-        cas = bratislava_pasmo.localize(datetime.now())
-        sprava = 'Detegovaný pohyb ' + cas.strftime(format)
+        cas = datetime.now()
+        upraveny_cas = cas.astimezone(bratislava_pasmo)
+        sprava = 'Detegovaný pohyb ' + upraveny_cas.strftime(cas_format)
         poslat_notifikaciu(imf_push_api, imf_push_appguid, sprava)
     if event.event == 'servo':
         print(payload)
@@ -265,4 +266,4 @@ def status_senzorov():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=port, debug=True, use_reloader=False)
+    app.run(host='0.0.0.0', port=port, debug=True, use_reloader=True)

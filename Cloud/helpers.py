@@ -20,13 +20,28 @@ def poslat_notifikaciu(apikey, appguid, sprava):
         'Accept-Language': 'en-US',
         'Authorization': access,
     }
+    """
     push_payload = {
         'message': {
             'alert': sprava
         },
     }
+    """
+    push_payload = {
+        "message": {
+            'alert': sprava,
+        },
+        'settings': {
+            'gcm': {
+                'icon': "ic_wb_incandescent_black_24dp",
+                'timeToLive': 40000
+             },
+        },
+    }
+    # {"messageId":"1Y6AFUwr","message":{"alert":"bluemix test"},"settings":{"gcm":{"icon":"ic_one"},}}
     push_notification = requests.post(f'http://imfpush.eu-de.bluemix.net/imfpush/v1/apps/{appguid}/messages',
                                       headers=push_headers, data=json.dumps(push_payload), verify=False)
+    print(json.dumps(push_payload))
     return push_notification.status_code
 
 
